@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Credit Risk Scorer</title>
+  <meta name="description" content="Estimate the probability that a loan applicant defaults." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="topbar" data-reveal style="--i:0">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 17l5-6 4 3 7-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="brand-name">Credit Risk Scorer</span>
+    </div>
+    <div class="status" id="status" data-state="pending">
+      <span class="dot"></span><span id="statusText">Connecting to API…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ───────── FORM ───────── -->
+    <form id="form" class="card form-card" novalidate data-reveal style="--i:1">
+      <div class="card-head">
+        <div>
+          <h1>Loan application</h1>
+          <p class="muted">Fill in the applicant's details and the model will estimate their default risk.</p>
+        </div>
+        <div class="presets">
+          <button type="button" class="ghost" data-preset="low">Low-risk sample</button>
+          <button type="button" class="ghost" data-preset="high">High-risk sample</button>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend><span class="step">01</span> Applicant</legend>
+
+        <div class="field" data-field="person_age" data-int="1">
+          <div class="field-head">
+            <label for="n-person_age">Age</label>
+            <div class="num"><input id="n-person_age" type="number" inputmode="numeric" min="18" max="120" step="1" value="30" required /><span class="unit">yrs</span></div>
+          </div>
+          <input class="slider" type="range" min="18" max="80" step="1" value="30" aria-label="Age" />
+        </div>
+
+        <div class="field" data-field="person_income" data-int="1">
+          <div class="field-head">
+            <label for="n-person_income">Annual income</label>
+            <div class="num"><span class="unit">$</span><input id="n-person_income" type="number" inputmode="numeric" min="500" max="100000000" step="500" value="55000" required /></div>
+          </div>
+          <input class="slider" type="range" min="4000" max="300000" step="500" value="55000" aria-label="Annual income" />
+        </div>
+
+        <div class="field" data-field="person_emp_length">
+          <div class="field-head">
+            <label for="n-person_emp_length">Employment length</label>
+            <div class="num"><input id="n-person_emp_length" type="number" inputmode="decimal" min="0" max="80" step="0.5" value="5" required /><span class="unit">yrs</span></div>
+          </div>
+          <input class="slider" type="range" min="0" max="40" step="0.5" value="5" aria-label="Employment length" />
+        </div>
+
+        <div class="group">
+          <span class="group-label">Home ownership</span>
+          <div class="segmented" role="radiogroup" aria-label="Home ownership">
+            <label><input type="radio" name="home" value="RENT" checked /><span>Rent</span></label>
+            <label><input type="radio" name="home" value="OWN" /><span>Own</span></label>
+            <label><input type="radio" name="home" value="MORTGAGE" /><span>Mortgage</span></label>
+            <label><input type="radio" name="home" value="OTHER" /><span>Other</span></label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">02</span> Loan</legend>
+
+        <div class="group">
+          <span class="group-label">Purpose</span>
+          <div class="chips" role="radiogroup" aria-label="Loan purpose">
+            <label><input type="radio" name="intent" value="PERSONAL" checked /><span>Personal</span></label>
+            <label><input type="radio" name="intent" value="EDUCATION" /><span>Education</span></label>
+            <label><input type="radio" name="intent" value="MEDICAL" /><span>Medical</span></label>
+            <label><input type="radio" name="intent" value="VENTURE" /><span>Venture</span></label>
+            <label><input type="radio" name="intent" value="HOMEIMPROVEMENT" /><span>Home improvement</span></label>
+            <label><input type="radio" name="intent" value="DEBTCONSOLIDATION" /><span>Debt consolidation</span></label>
+          </div>
+        </div>
+
+        <div class="group">
+          <span class="group-label">Loan grade</span>
+          <div class="segmented grades" role="radiogroup" aria-label="Loan grade">
+            <label><input type="radio" name="grade" value="A" /><span>A</span></label>
+            <label><input type="radio" name="grade" value="B" checked /><span>B</span></label>
+            <label><input type="radio" name="grade" value="C" /><span>C</span></label>
+            <label><input type="radio" name="grade" value="D" /><span>D</span></label>
+            <label><input type="radio" name="grade" value="E" /><span>E</span></label>
+            <label><input type="radio" name="grade" value="F" /><span>F</span></label>
+            <label><input type="radio" name="grade" value="G" /><span>G</span></label>
+          </div>
+        </div>
+
+        <div class="field" data-field="loan_amnt" data-int="1">
+          <div class="field-head">
+            <label for="n-loan_amnt">Loan amount</label>
+            <div class="num"><span class="unit">$</span><input id="n-loan_amnt" type="number" inputmode="numeric" min="100" max="10000000" step="100" value="10000" required /></div>
+          </div>
+          <input class="slider" type="range" min="500" max="35000" step="100" value="10000" aria-label="Loan amount" />
+        </div>
+
+        <div class="field" data-field="loan_int_rate">
+          <div class="field-head">
+            <label for="n-loan_int_rate">Interest rate</label>
+            <div class="num"><input id="n-loan_int_rate" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="10" required /><span class="unit">%</span></div>
+          </div>
+          <input class="slider" type="range" min="5" max="24" step="0.1" value="10" aria-label="Interest rate" />
+        </div>
+
+        <div class="lti" aria-live="polite">
+          <div class="lti-top">
+            <span>Loan-to-income <em>(calculated)</em></span>
+            <strong id="ltiVal">18%</strong>
+          </div>
+          <div class="lti-bar"><span id="ltiBar"></span></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">03</span> Credit history</legend>
+
+        <div class="group">
+          <span class="group-label">Prior default on file</span>
+          <div class="segmented two" role="radiogroup" aria-label="Prior default on file">
+            <label><input type="radio" name="dflt" value="N" checked /><span>No</span></label>
+            <label><input type="radio" name="dflt" value="Y" /><span>Yes</span></label>
+          </div>
+        </div>
+
+        <div class="field" data-field="cb_person_cred_hist_length" data-int="1">
+          <div class="field-head">
+            <label for="n-cb_person_cred_hist_length">Credit history length</label>
+            <div class="num"><input id="n-cb_person_cred_hist_length" type="number" inputmode="numeric" min="0" max="80" step="1" value="5" required /><span class="unit">yrs</span></div>
+          </div>
+          <input class="slider" type="range" min="2" max="30" step="1" value="5" aria-label="Credit history length" />
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" class="ghost" id="reset">Reset</button>
+        <button type="submit" class="primary" id="submit">
+          <span class="btn-label">Assess risk</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+    </form>
+
+    <!-- ───────── RESULT ───────── -->
+    <aside class="card result-card" id="panel" data-state="idle" data-reveal style="--i:2" aria-live="polite">
+      <div class="card-head compact">
+        <h2>Risk assessment</h2>
+        <span class="badge" id="verdictBadge">Waiting</span>
+      </div>
+
+      <div class="gauge">
+        <svg viewBox="0 0 240 150" aria-hidden="true">
+          <path class="gauge-track" d="M 20 130 A 100 100 0 0 1 220 130" pathLength="100" />
+          <path class="gauge-fill" id="gaugeFill" d="M 20 130 A 100 100 0 0 1 220 130" pathLength="100" />
+        </svg>
+        <div class="gauge-readout">
+          <div class="pct"><span id="pct">--</span><small id="pctSign" hidden>%</small></div>
+          <div class="pct-label">probability of default</div>
+        </div>
+        <div class="gauge-scale"><span>0%</span><span>100%</span></div>
+      </div>
+
+      <div class="verdict">
+        <h3 id="verdict">No assessment yet</h3>
+        <p class="muted" id="verdictSub">Enter an application and press <b>Assess risk</b>. Your result will appear here.</p>
+      </div>
+
+      <div class="history-wrap">
+        <div class="history-head"><span>Recent checks</span><button type="button" class="link" id="clearHistory" hidden>Clear</button></div>
+        <ul class="history" id="history">
+          <li class="empty">Nothing yet.</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="foot" data-reveal style="--i:3">
+    Model output is a statistical estimate and should support, not replace, human judgement.
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="assertive"></div>
+
+  <script>
+    // If the UI is hosted separately from the API, set the API URL here, e.g.
+    // window.API_BASE = "https://your-api.onrender.com";
+    window.API_BASE = "";
+  </script>
+  <script src="/static/script.js" defer></script>
+</body>
+</html>
